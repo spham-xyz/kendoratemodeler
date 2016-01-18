@@ -1,0 +1,397 @@
+﻿html,
+body {
+   height: 100%;
+   margin: 0;
+   padding: 0;
+}
+
+html {
+   /*overflow-y: scroll;*/
+   /*overflow: hidden;*/
+   /*font: 70% Arial,Helvetica,sans-serif;*/
+   font: 11px Arial,Helvetica,sans-serif !important;
+}
+
+input[type='radio'] {
+   border: 0;
+   width: 10px;
+   height: 1.1em;
+   font-size: 1em;
+}
+
+input[type='checkbox'] {
+   /*width: 8%;*/
+   height: 1.05em;
+}
+
+fieldset {
+   border: 2px outset grey;
+   /*margin: 0;*/
+   padding: 5px;
+   width: 300px;
+}
+
+   fieldset legend {
+      display: block;
+      font-size: 1.0em;
+   }
+
+label {
+   display: inline;
+}
+
+.floatleft {
+   float: left;
+}
+
+.floatright {
+   float: right;
+}
+
+.clearfix {
+   clear: both;
+}
+
+.k-button {
+   font-size: 1.15em;
+}
+/*
+#wincontainer {
+   position: relative;
+}
+*/
+#divMain {
+   /*display: -ms-grid;
+   -ms-grid-columns: 1fr[3];
+   -ms-grid-rows: 7fr 35px[2] 10fr 40px 40px;*/
+   /*padding: 50px 25px;  tb rl */
+   padding: 30px 25px 50px 25px; /* tbrl */
+   /* Center div */
+   width: 1100px;
+   margin-left: auto;
+   margin-right: auto;
+}
+
+#divSelectionsContainer {
+   display: flex;
+
+   /*justify-content: center;*/
+   /*align-items: flex-start;*/
+}
+
+   #divSelectionsContainer > div {
+      margin: 0 auto; /* center page: tb lr */
+      width: 33%;
+   }
+
+#divDisplayContainer {
+   display: flex;
+}
+
+   #divDisplayContainer > div {
+      margin: 0 auto;  /* center page: tb lr */
+      /*margin-left: 5px;*/
+      width: 33%;
+   }
+
+/*#divDur, #divMat {
+   margin-left: 5px;
+}*/
+
+/*#spnSound {
+   float: right;
+   padding-right: 3.5em;
+}*/
+
+/*
+#divType {
+   -ms-grid-row: 1;
+   -ms-grid-column: 1;
+}
+
+#divPeriod {
+   -ms-grid-row: 1;
+   -ms-grid-column: 2;
+}
+#divModel {
+   -ms-grid-row: 1;
+   -ms-grid-column: 3;
+}
+   #divModel > fieldset {
+      height: 130px;
+   }
+
+#divClient {
+   -ms-grid-row: 2;
+   -ms-grid-column: 1;
+}
+
+#divStart {
+   -ms-grid-row: 2;
+   -ms-grid-column: 2;
+}
+
+#divCurrency {
+   -ms-grid-row: 2;
+   -ms-grid-column: 3;
+}
+
+#divMatter {
+   -ms-grid-row: 3;
+   -ms-grid-column: 1;
+}
+
+#divDuration {
+   -ms-grid-row: 3;
+   -ms-grid-column: 2;
+}
+
+#divGroup {
+   -ms-grid-row: 3;
+   -ms-grid-column: 3;
+}
+
+#divTk {
+   -ms-grid-row: 4;
+   -ms-grid-column: 1;
+   -ms-grid-column-span: 3;
+   /*height: 250px;
+}
+*/
+
+/* SP
+#divBtns {
+   -ms-grid-row: 5;
+   -ms-grid-column: 1;
+   -ms-grid-column-span: 3;
+}
+*/
+#divFooter {
+   /*
+   -ms-grid-row: 6;
+   -ms-grid-column: 1;
+   -ms-grid-column-span: 3;
+   */
+   margin-top: 3px;
+}
+
+#divNote {
+   /*
+   -ms-grid-row: 7;
+   -ms-grid-column: 1;
+   -ms-grid-column-span: 3;
+   */
+   margin-top: 30px;
+   margin-right: 40px;
+   font-size: 9pt;
+   font-family: Arial;
+}
+
+#spnSound {
+   padding-left: 75px;
+}
+
+#txtClient {
+   width: 60%;
+}
+
+#btnSearch {
+   position: relative;
+   top: 13px;
+   left: 5%;
+   width: 20%;
+}
+
+#spnFrom span.k-tooltip {
+  position: relative;
+  right: 140px;
+}
+
+#spnTo span.k-tooltip {
+  position: relative;
+  left: 25px;
+}
+
+#lblFrom {
+   position: relative;
+   left: 15%;
+}
+
+#lblTo {
+   position: relative;
+   left: 55%;
+}
+
+.from-picker {
+   margin-left: 25px;
+}
+
+.to-picker {
+   margin-left: 75px;
+}
+
+/* Shift error tooltip 
+#spnFrom span.k-tooltip {
+   position: relative;
+   right: 175px;
+}
+*/
+
+#lblFromFormat {
+   position: relative;
+   left: 12%;
+}
+
+#lblToFormat {
+   position: relative;
+   left: 48%;
+}
+
+#spnBilled {
+   position: relative;
+   left: 12%;
+}
+
+#spnUnbilled {
+   position: relative;
+   left: 25%;
+}
+
+#btnPull {
+   position: relative;
+   left: 40%;
+   font-size: 11px;
+}
+
+#grdTk, #divBtns, #divFooter {
+   max-width: 1050px;
+}
+
+#grdTk {
+   font-size: 11px;
+}
+
+#divBtns {
+   /*position: relative;*/
+   /*top: 25px;*/
+   margin-top: 10px;
+}
+
+#btnExl {
+   float: right;
+   width: 65px;
+}
+
+#spnConv {
+   display: inline-block;
+   float: right;
+   font: 11px Arial, Helvetica, sans-serif;
+}
+
+.rate {
+   padding: 4px 0; /*tb lr*/
+}
+
+.myDDL {
+   width: 87%;
+}
+
+.align-center {
+   text-align: center;
+}
+
+.align-right {
+   text-align: right;
+}
+
+.k-button, .k-window-titlebar {
+   font-size: 1.0em;
+}
+
+.k-textbox, .myFont {
+   font-size: 11px;
+   max-height: 20px;
+}
+
+.k-treeview {
+   font: 11px Arial,Helvetica,sans-serif;
+}
+
+.k-calendar {
+   font-size: 10px;
+}
+
+span.k-datepicker {
+   width: 70px;
+}
+
+/*th.k-header {
+   text-align: center;
+}*/
+
+.k-grid-header {
+   /*font-size: 10px;*/
+   font-size: 1.0em;
+}
+
+/* Column header wrap around */
+.k-grid-header .wrap-header {
+   height: auto;
+   overflow: visible             !important;
+   white-space: normal           !important;
+   text-align: center            !important;
+}
+
+#grdTk tbody tr:hover {
+   background: #a6dbed;
+}
+/* default column width */
+#grdTk col, #grdTk td, #grdTk th {
+   width: 105px;
+}
+
+/*
+#grdTk > .k-grid-content {
+    height: 175px;
+}
+*/
+
+/* Begin: Remove the vertical scrollbar */
+#grdTk .k-grid-header {
+   padding: 0 !important;
+}
+
+#grdTk .k-grid-footer {
+   padding: 0 !important;
+}
+
+#grdTk .k-grid-content {
+   overflow-y: visible;
+}
+/* End: Remove the vertical scrollbar */
+
+/* grid */
+.k-grid tbody td { /* .k-grid tbody tr td { */
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+/* Horizontal grid lines */
+.k-grid tr td {
+    border-bottom: 1px solid #e4e4e4;
+}
+
+/* dropdownlist */
+li.k-item {
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.cnvRate {
+   display: inline-block;
+   background-color: #cecbcb;
+   width: 100%;
+   /*border: 1px solid red*/
+}

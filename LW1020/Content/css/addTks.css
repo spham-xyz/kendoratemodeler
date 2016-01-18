@@ -1,0 +1,137 @@
+﻿#divAddTks {
+   /*display: -ms-grid;*/
+   /*-ms-grid-columns: 2fr 2fr 1fr 5fr;*/
+   /*-ms-grid-columns: 150px 150px 85px 360px;
+   -ms-grid-rows: 150px 185px;*/
+   width: 735px;
+   /* margin: 0 auto; */ /*tb rl*/
+   /*border: 1px solid red;*/
+   display: flex;
+}
+
+#divTksContainer {
+   max-width: 42%;
+   background: transparent;
+   display: block;
+}
+
+#divLoc {
+   /*-ms-grid-row: 1;
+   -ms-grid-column: 1;*/
+   max-width: 150px;
+   float: left;
+}
+
+#divTitle {
+   /*-ms-grid-row: 1;
+   -ms-grid-column: 2;*/
+   max-width: 150px;
+   float: left;
+   margin-left: 5px;
+   margin-bottom: 5px;
+}
+
+#grdAvailTks {
+   /*-ms-grid-row: 2;
+   -ms-grid-column: 1;
+   -ms-grid-column-span: 2;*/
+   /*min-width: 288px;*/
+   max-width: 305px;
+   max-height: 190px;
+   overflow-y: auto;
+   overflow-x: hidden;
+   clear: both;
+}
+
+#divBtnsContainer {
+   max-width: 12%;
+   margin: 0 auto;
+}
+
+#divQryCnc {
+   /*-ms-grid-row: 1;
+   -ms-grid-column: 3;*/
+}
+
+#divAddDel {
+   /*-ms-grid-row: 2;
+   -ms-grid-column: 3;*/
+   margin-top: 55px;
+}
+
+#divPrjHrs {
+   /*-ms-grid-row: 1;
+   -ms-grid-row-span: 2;
+   -ms-grid-column: 4;*/
+   max-width: 43%;
+}
+
+#lstLoc {
+   max-height: 133px;
+   overflow: auto;
+   /*padding-right: 25px;*/
+   width: 150px;
+}
+
+#lstTitle {
+   max-height: 133px;
+   overflow: auto;
+   width: 150px;
+}
+
+/* Listviews */
+div[role="option"]:hover {
+   background: #95d3f2;
+}
+
+#grdPrjHrs {
+   max-height: 330px;
+   min-width: 345px;
+   overflow-y: auto;
+   overflow-x: hidden;
+}
+
+#grdAvailTks tbody tr:hover {
+   background: #95d3f2;
+}
+
+#grdPrjHrs tbody tr:hover {
+   background: #95d3f2;
+}
+
+/* Remove the vertical scrollbar: http://docs.telerik.com/kendo-ui/web/grid/appearance */
+#grdAvailTks .k-grid-header {
+   padding: 0 !important;
+}
+
+#grdAvailTks .k-grid-content {
+   overflow-y: visible;
+}
+
+#grdPrjHrs .k-grid-header {
+   padding: 0 !important;
+}
+
+#grdPrjHrs .k-grid-content {
+   overflow-y: visible;
+}
+/* End: Remove the vertical scrollbar */
+
+#btnQuery {
+   margin: 40px 20px;
+}
+
+#btnAddTk {
+   margin-top: 25px;
+   margin-left: 30px;
+}
+
+#btnDelTk {
+   margin-top: 5px;
+   margin-left: 30px;
+}
+
+#btnAddRoster {
+   margin-top: 50px;
+   margin-left: 1px;
+}

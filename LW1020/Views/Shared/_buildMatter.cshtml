@@ -1,0 +1,57 @@
+﻿<link href="~/Content/css/buildMatter.css" rel="stylesheet" />
+
+<div id="divMatterName">
+   <span id="lblName">Matter Name:</span>
+   <input type="text" id="txtName" class="k-textbox" placeholder="Required" autofocus />
+</div>
+<div id="divMatterCurr">
+   <span id="lblCurr">Matter's Currency:</span>
+   <span id="ddlCurr"></span>
+</div>
+<div id="divButton">
+   <button id="btnOk" class="k-button" disabled>OK</button>
+</div>
+
+<script>
+   (function () {
+      $('#ddlCurr').kendoDropDownList({
+         dataSource: {
+            transport: {
+               read: {
+                  //url: $.url('Home/GetCurrCodes'),
+                  url: $.url('api/Modeler/GetCurrCodes'),
+                  dataType: 'jsonData'
+               }
+            },
+            schema: {
+               parse: function (response) {
+                  var currs = [];
+                  for (var i = 0; i < response.length; i++) {
+                     var curr = {
+                        code: response[i].curcode,
+                        text: response[i].curcode + '  ' + response[i].curword
+                     };
+                     currs.push(curr);
+                  }
+                  return currs;
+               }
+            }
+         },
+         dataValueField: "code",
+         dataTextField: "text"
+      }).data("kendoDropDownList")
+      //.list.width(100);
+      .wrapper.width(110);
+
+      $('#txtName').on('keyup', function (e) {
+         if (this.value.trim().length > 0)
+            $('#btnOk').prop('disabled', false);
+         else
+            $('#btnOk').prop('disabled', true);
+      });
+
+      $('#btnOk').on('click', function (e) {
+         window.parent.$("#winMat").data("kendoWindow").close();
+      });
+   }())
+</script>

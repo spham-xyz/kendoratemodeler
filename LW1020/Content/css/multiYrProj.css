@@ -1,0 +1,97 @@
+﻿#divProj {
+   /*display: -ms-grid;
+   -ms-grid-columns: 5fr 5fr;
+   -ms-grid-rows: 1fr;*/
+   /*padding: 50px 25px;*/ /* tb rl */
+   /* Center div */
+   width:100%;
+   margin-left: auto;
+   margin-right: auto;
+   /*border: 1px solid red;*/
+
+   display: flex;
+}
+
+#divInput {
+   /*-ms-grid-row: 1;
+   -ms-grid-column: 1;*/
+   margin-top: 15px;
+ 
+   width:50%;  
+}
+
+#divGrid {
+   /*-ms-grid-row: 1;
+   -ms-grid-column: 2;*/
+  width:50%;
+  
+}
+
+#divInput div {
+   height: 35px;
+}
+
+#spnStart {
+   float: right;
+   padding-right: 35px;
+}
+
+#spnStart span.k-tooltip {
+   position: relative;
+   left: 23px;	
+}
+
+/*
+#startDate {
+   width: 75px; 
+   margin-right: -15px;
+}
+*/
+
+#spnDuration {
+   float: right;
+   padding-right: 27px;
+}
+
+#spnIncrease {
+   float: right;
+   padding-right: 40px;
+}
+
+#divYears,
+#divMonths {
+   margin-left: auto;
+   margin-right: auto;
+   width: 60%;
+   /*background-color: #b0e0e6;*/
+}
+
+input[name="rbAlloc"] {
+   float: right;
+}
+
+#divButtons {
+   margin-left: auto;
+   margin-right: auto;
+   width: 70%;
+}
+/*
+#divContinue {
+   margin-left: auto;
+   margin-right: auto;
+   width: 40%;
+}
+*/
+#grdAlloc {
+   height: 265px;
+   width: 255px;
+}
+
+#grdAlloc > .k-grid-content {
+    overflow-x: hidden;    /*Hide horizontal scrollbar*/
+    font-size: 1.0em;
+}
+
+#grdAlloc > .k-footer-template {
+    font-size: 1.2em;
+}

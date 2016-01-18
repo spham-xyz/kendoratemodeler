@@ -1,0 +1,134 @@
+﻿<div id="tvClients"></div>
+
+<script>
+   (function () {
+      kendo.ui.progress($('#winCli'), true);    // $('#winCli') == $('#tvClients').parent()
+      globalStore.cliNum = globalStore.cliNum || '';
+      globalStore.cliName = globalStore.cliName || '';
+      //toastr.info('cliNum: ' + globalStore.cliNum + ', cliName: ' + globalStore.cliName + ', cliSndx: ' + globalStore.cliSndx);
+
+      var cliData = [];
+      $.ajax({
+         //url: '@Url.Action("GetClients", "Pages", null, "http")',
+         url: $.url('api/Modeler/GetClients'),
+         //url: 'api/Modeler/GetClients',
+         data: { ClientId: globalStore.cliNum, ClientName: globalStore.cliName, ClientDpt: '', MatterId: '', MatterName: '', Soundex: globalStore.cliSndx },
+         //type: 'POST',
+         dataType: 'jsonData',
+         success: function (data) {
+            if (JSON.stringify(data) != "[]") {
+               var getUniqueClient = function (prev, curr) {
+                  var num = curr.clnum;
+                  prev[num] = prev[num] || [];
+                  prev[num].push(curr);
+                  return prev;
+               },
+               groupedByClients = data.reduce(getUniqueClient, {}),
+               //alert(JSON.stringify(groupedByClients, null, 2));
+               output = [];
+
+               cliData = Object.keys(groupedByClients).reduce(function (a, prop) {
+                  var dtl = [];
+                  //alert(groupedByClients[prop][0].clname1);
+                  //groupedByClients['052409'].length --> 2
+                  //groupedByClients['052409'][0].mdesc1 --> "General"
+                  //groupedByClients['052409'][1].mdesc1 --> "United States Radio Station Project"
+                  //a[prop] = groupedByClients[prop]
+                  groupedByClients[prop].forEach(function (val) {
+                     dtl.push({
+                        text: val.mmatter.trim(),
+                        desc: val.mdesc1.trim()
+                     });
+                  });
+
+                  output.push({
+                     text: groupedByClients[prop][0].clnum.trim(),
+                     desc: groupedByClients[prop][0].clname1.trim(),
+                     items: dtl
+                  });
+                  return output;
+               }, {});
+
+               cliData.unshift({ text: '<b><u>Client/Matter Search</u></b>', desc: '' });
+               //alert(JSON.stringify(cliData, null, 2));
+            } else {
+               cliData.push({ text: '      ', desc: 'No results found' });       // indent details by 6 spaces
+            }
+         },
+         error: function (xhr, status, err) {
+            toastr.error('GetClients', err);
+            cliData.push({ text: 'Error:', desc: 'GetClients - ' + err });
+         },
+         complete: function () {
+            //var treeview = $("#tvClients").kendoTreeView({ template: "#= item.text #  #= item.desc #" }).data("kendoTreeView");
+            //treeview.setDataSource(new kendo.data.HierarchicalDataSource({ data: cliData }));
+            $("#tvClients").kendoTreeView({
+               template: "#= item.text # #= item.desc #",
+               dataSource: cliData,
+               select: selClient
+            });
+
+            kendo.ui.progress($('#winCli'), false);
+         }
+      });
+
+      var selClient = function (e) {
+         if (e.node.innerText.trim() != 'Client/Matter Search' && this.text(e.node).length != 6) {
+            globalStore.matNum = this.text(e.node);
+
+            $.ajax({
+               //url: '@Url.Action("GetClients", "Pages", null, "http")',
+               url: $.url('api/Modeler/GetClients'),
+               data: { 'ClientId': '', 'ClientName': '', 'ClientDpt': '', 'MatterId': globalStore.matNum, 'MatterName': '', 'Soundex': 1 },
+               dataType: 'jsonData',
+               success: function (data) {
+                  if (JSON.stringify(data) != "[]") {
+                     $('#divClient').text('Client:  ' + data[0].clnum.trim() + ' ' + data[0].clname1.trim().slice(0, 45));
+                     $('#divMatter').text('Matter:  ' + data[0].mmatter.trim().split('-').pop() + ' ' + data[0].mdesc1.trim().slice(0, 45));
+                     $('#divCurrency').text('Matter\'s Currency:  ' + data[0].mcurrency);
+                  }
+               },
+               error: function (xhr, status, err) {
+                  toastr.error('GetClients', err);
+               }
+            });
+            $.get($.url('api/Modeler/GetRateGrpDesc'), { MatterId: globalStore.matNum }, function (data) {
+               @*$.post('@Url.Action("GetRateGrpDesc", "Pages", null, "http")', { MatterId: globalStore.matNum }, function (data) {*@
+               $('#divGroup').text('Matter\'s Rate Group:  ' + data);
+            }).fail(function (xhr, status, err) {
+               toastr.error('GetRateGrpDesc', err);
+            });
+
+            window.parent.$("#winCli").data("kendoWindow").close();
+         }
+      };
+
+   })();
+
+   //$("#tvClients").kendoTreeView({
+   //   dataSource: [{
+   //      id: 1, text: "My Documents", expanded: true, items: [
+   //          {
+   //             id: 2, text: "Kendo UI Project", expanded: true, items: [
+   //                 { id: 3, text: "about.html" },
+   //                 { id: 4, text: "index.html" },
+   //                 { id: 5, text: "logo.png" }
+   //             ]
+   //          },
+   //          {
+   //             id: 6, text: "New Web Site", expanded: true, items: [
+   //                 { id: 7, text: "mockup.jpg" },
+   //                 { id: 8, text: "Research.pdf" },
+   //             ]
+   //          },
+   //          {
+   //             id: 9, text: "Reports", expanded: true, items: [
+   //                 { id: 10, text: "February.pdf" },
+   //                 { id: 11, text: "March.pdf" },
+   //                 { id: 12, text: "April.pdf" }
+   //             ]
+   //          }
+   //      ]
+   //   }]
+   //});
+</script>

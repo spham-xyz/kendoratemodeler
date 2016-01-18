@@ -1,0 +1,17 @@
+﻿#divMatterCurr {
+    margin: 5px 0
+}
+
+#divButton {
+     margin: 0 auto;
+     max-width: 55px
+}
+
+#txtName {
+   width: 200px;
+}
+
+#btnOk {
+   width: 50px;
+   margin-top: 7px;
+}

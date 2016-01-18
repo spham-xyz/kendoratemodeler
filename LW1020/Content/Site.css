@@ -1,0 +1,20 @@
+﻿.NAVBAR {
+   font-family: Verdana, Helvetica, Arial, sans-serif;
+   font-size: 10pt;
+   color: #FFFFFF;
+}
+
+.NAVBAR A:LINK, .NAVBAR A {
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+.NAVBAR A:VISITED {
+   color: #FFFFFF;
+}
+
+.NAVBAR A:HOVER {
+   color: #333366;
+   text-decoration: none;
+   background-color: #CCCCCC;
+}

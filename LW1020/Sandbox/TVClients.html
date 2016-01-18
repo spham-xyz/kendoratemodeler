@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+   <title></title>
+   <link href="http://cdn.kendostatic.com/2014.2.1008/styles/kendo.common.min.css" rel="stylesheet" type="text/css" />
+   <!--<link href="http://cdn.kendostatic.com/2014.2.1008/styles/kendo.default.min.css" rel="stylesheet" type="text/css" />-->
+   <link href="http://cdn.kendostatic.com/2014.2.1008/styles/kendo.blueopal.min.css" rel="stylesheet" type="text/css" />
+   <script src="http://cdn.kendostatic.com/2014.2.1008/js/jquery.min.js"></script>
+   <script src="http://cdn.kendostatic.com/2014.2.1008/js/kendo.all.min.js"></script>
+   <script src="http://cdn.kendostatic.com/2014.2.1008/js/kendo.aspnetmvc.min.js"></script>
+
+</head>
+<body>
+   <div id="tvClients"></div>
+
+   <script>
+      $(function () {
+         //var dsTv = new kendo.data.HierarchicalDataSource({
+         //   transport: {
+         //      read: { url: '@Url.Action("Menu_Read")' }
+         //   },
+         //   schema: {
+         //      model: {
+         //         id: "Id",
+         //         hasChildren: "HasChildren"
+         //      }
+         //   }
+         //});
+         /*
+         $.ajax({
+            url: '@Url.Action("GetClients", "Home")',
+            data: { Type: '' },        // On load, populate all items
+            type: 'POST',
+            //contentType: 'application/json; charset=utf-8',     //Need to comment out if 'data' is present
+            dataType: 'json',
+            success: function (data) {
+               if (JSON.stringify(data) != "[]") {
+                  //var ddl = $('#ddlCapital').data("kendoDropDownList");
+                  //ddl.setDataSource(data);
+                  //ddl.refresh();
+               }
+            },
+            error: function (xhr, status, err) {
+               alert(err);
+            }
+         });
+         */
+         var data = [];
+         data
+
+         $("#tvClients").kendoTreeView({
+            template: "#= item.text # #= item.desc #",
+            dataSource: [
+              {
+                 text: "053345", desc: "Phoenix Energy Technologies, Inc.", items: [
+                 { text: "053345-0000", desc: "General" }
+                 ]
+              },
+              {
+                 text: "043304", desc: "Phoenix International", items: [
+                 { text: "043304-0005", desc: "Shareholder Matters" }
+                 ]
+              },
+              {
+                 text: "052409", desc: "Phoenix Satellite Television Holdings Limited", items: [
+                 { text: "052409-0000", desc: "General" },
+                 { text: "052409-0001", desc: "United States Radio Station Project" }
+                 ]
+              }
+            ]
+         });
+      });
+   </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+﻿@*<link href="~/Content/bootstrap.min.css" rel="stylesheet" />*@
+
+<div id="divProj" class="row">
+      <div class="col-md-6">
+         <div class="row">
+            <label id="lblStart">Start Date (MM/YYYY): </label>
+            <div id="startDate"></div>
+         </div>
+         <div class="row">
+            <label id="lblDuration">Duration in Months:</label>
+            <div id="durMonths"></div>&nbsp; mos.
+         </div>
+         <div class="row">
+            <label id="lblIncrease">Annual Rate Increase:</label>
+            <div id="pctIncrease"></div>&nbsp; mos.
+         </div>
+
+         <div class="row">
+            <label for="Years">Allocate across years</label>
+            <input type="radio" name="rbAlloc" value="Years">
+         </div>
+         <div class="row">
+            <label for="Months">Allocate across months</label>
+            <input type="radio" name="rbAlloc" value="Months" checked>
+         </div>
+         <div class="row">
+            <button id="btnAlloc" class="k-button"></button>
+            <button id="btnCancel" class="k-button"></button>
+         </div>
+         <div class="row">
+            <button id="btnContinue" class="k-button"></button>
+         </div>
+      </div>
+      <div class="col-md-6">
+         <div id="grdAlloc"></div>
+      </div>
+</div>
+
+<script>
+   (function ($) {
+      $("#grdTk").kendoGrid({
+         grdAlloc: 25
+      })
+   })(jQuery);
+</script>

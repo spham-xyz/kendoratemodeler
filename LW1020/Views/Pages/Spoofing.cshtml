@@ -1,0 +1,31 @@
+﻿@using (Html.BeginForm("Main", "Pages", FormMethod.Post, new { @class = "spoof" }))
+{
+   <br />
+   <span>Enter the Network NT ID you want to spoof</span>
+   <br />
+   <input type="text" id="txtNTID" name="spooferID" style="width:146px;" autofocus />
+   <br />
+   <input type="submit" value="Enter Application" id="btnOK" style="width:150px;" />
+   <br />
+   <br />
+   <br />
+   <br />
+   <br />
+   <br />
+   <span id="lblWarning" style="display:inline-block;color:Red;font-family:Arial;font-weight:bold;width:919px;"></span>
+}
+<style type="text/css">
+   .spoof {
+      margin-left: 10px;
+   }
+</style>
+<script type="text/javascript">
+   var isSpoofer = @Html.Raw(Json.Encode(ViewBag.IsSpoofer));
+
+   if(!isSpoofer)
+   {
+      $('#txtNTID').prop('disabled', true);
+      $('#btnOK').prop('disabled', true);
+      $('#lblWarning').text("Warning: You do not have permission to use spoofing function.");
+   }
+</script>

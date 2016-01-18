@@ -1,0 +1,152 @@
+﻿<div id="wincontainer"></div>
+<div id="divMain">
+   <div id="divSelectionsContainer">
+      <div id="divType">
+         <fieldset>
+            <legend>Choose a Client/Matter:</legend>
+            <div>
+               <div>
+                  <div>
+                     <label>Client No/Name:</label>
+                     <span id="spnSound">
+                        <input type="checkbox" id="chkSound"><label for="chkSound">"Sounds Like" search</label><br />
+                     </span>
+                  </div>
+               </div>
+               <div>
+                  <input type="radio" name="rbType" value="Client" checked>&nbsp;
+                  <input type="text" id="txtClient" class="k-textbox" autofocus />
+                  <button id="btnSearch" class="k-button">Search</button>
+               </div>
+               <input type="radio" name="rbType" value="Matter">&nbsp;&nbsp;<label for="Matter">Build a matter</label>
+            </div>
+         </fieldset>
+      </div>
+      <div id="divPeriod" disabled>
+         <fieldset>
+            <legend>Choose a Period (MMYY):</legend>
+            <div>
+               <input type="radio" name="rbPeriod" value="Year" checked><label for="Year">&nbsp;Current Year</label>
+            </div>
+            <div>
+               <input type="radio" name="rbPeriod" value="Period">&nbsp;<label for="Period">Period - Up to 3 years</label>
+            </div>
+            <div>
+               <label id="lblFrom">From:</label><label id="lblTo">To:</label>
+            </div>
+            <div>
+               <span id="spnFrom" class="from-picker"><input id="fromDate" /></span>
+               <span id="spnTo" class="to-picker"><input id="toDate" /></span><br />
+            </div>
+            <div>
+               <label id="lblFromFormat">(MMYY)</label><label id="lblToFormat">(MMYY)</label>
+            </div>
+
+            <hr />
+
+            <div>
+               <span id="spnBilled">
+                  <input type="checkbox" id="chkBilled" class="bill" checked><label>Billed Time</label>
+               </span>
+               <span id="spnUnbilled">
+                  <input type="checkbox" id="chkUnbilled" class="bill"><label>Unbilled Time</label>
+               </span>
+            </div>
+         </fieldset>
+      </div>
+      <div id="divModel">
+         <fieldset>
+            <legend>Choose a Rate Model:</legend>
+            <div>
+               <div class="myFont rate">Rate 1&nbsp;&nbsp;<div id="ddlModel1" class="myDDL"></div></div>
+               <div class="myFont rate">Rate 2&nbsp;&nbsp;<div id="ddlModel2" class="myDDL"></div></div>
+               <div class="myFont rate">Rate 3&nbsp;&nbsp;<div id="ddlModel3" class="myDDL"></div></div>
+               <div class="myFont rate"><button id="btnPull" class="k-button" disabled>Pull Roster</button></div>
+            </div>
+         </fieldset>
+      </div>
+   </div>
+   <div id="divDisplayContainer">
+      <div id="divCli">
+         <div id="divClient" class="myFont">&nbsp;</div>
+         <div id="divMatter" class="myFont">&nbsp;</div>
+      </div>
+      <div id="divDur">
+         <div id="divStart" class="myFont">&nbsp;</div>
+         <div id="divDuration" class="myFont">&nbsp;</div>
+      </div>
+      <div id="divMat">
+         <div id="divCurrency" class="myFont">&nbsp;</div>
+         <div id="divGroup" class="myFont">&nbsp;</div>
+      </div>
+   </div>
+   <div id="divTk"><div id="grdTk"></div></div>
+   <div id="divBtns">
+      <button id="btnDel" class="k-button" disabled>Delete Timekeepers</button>
+      <button id="btnAdd" class="k-button" disabled>Add Timekeepers</button>
+      <button id="btnPrj" class="k-button" disabled>Multi-year Projection</button>
+      <button id="btnExl" class="k-button" disabled>Excel</button>
+   </div>
+   <div id="divFooter">
+      <span id="spnConv">Shaded Rates: Firm Base converted to Rate currency.</span>
+   </div>
+   <div id="divNote">
+      All rates shown for comparison are current year rates. The Rate Modeler is not intended to be used for re-pricing existing WIP and/or Accounts Receivable.
+      Any estimation or re-pricing of hours that contains hours worked in previous years will not be accurate.
+      For assistance with any other re-pricing issues, please contact either the
+      <a href="mailto:FinancialInformationCenter.GSO@lw.com?Subject=Rate%20Modeler" target="_top">
+         #L&W Financial Information Center
+      </a> or the
+      <a href="mailto:LWRATEANALYSIS@lw.com?Subject=Rate%20Modeler" target="_top">
+         #L&W Rate Analysis Team.
+      </a>
+   </div>
+</div>
+
+
+@section styles {
+   <link href="@Url.Content("~/Content/css/Main.css")" rel="stylesheet" />
+}
+
+@section scripts {
+   <script src="@Url.Content("~/Scripts/require.js")" data-main="@Url.Content("~/Scripts/app/app")"></script>
+
+   <!-- http://docs.telerik.com/kendo-ui/framework/templates/overview -->
+   <script id="tmplRate" type="text/x-kendo-template">
+      # if (data.value === '') { #                 @* optionLabel: Select rate model # *@
+      <span>#= data.text #</span>                  @* ${data.text} *@
+      # } else if (typeof data.value !== 'number') { #
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <span>#= data.text #</span>
+      # } else { #
+      <span style="font-weight: bold">${data.text}</span>
+      # } #
+   </script>
+
+   <!--
+   http://blog.falafel.com/kendo-undocumented-variables-templates/
+   http://docs.telerik.com/kendo-ui/api/javascript/kendo#methods-format
+   http://docs.telerik.com/kendo-ui/framework/globalization/numberformatting
+   -->
+   <script id="tmplConv1" type="text/x-kendo-template">
+      # if (data.conv1 == 'Y') { #
+      <div class="cnvRate">${ kendo.toString(data.rate1, "n") }</div>
+      # } else { #
+      <div>${ kendo.toString(data.rate1, "n") }</div>
+      # } #
+   </script>
+   <script id="tmplConv2" type="text/x-kendo-template">
+      # if (data.conv2 == 'Y') { #
+      <span class="cnvRate">${ kendo.toString(data.rate2, "n") }</span>
+      # } else { #
+      <span>${ kendo.toString(data.rate2, "n") }</span>
+      # } #
+   </script>
+   <script id="tmplConv3" type="text/x-kendo-template">
+      # if (data.conv3 == 'Y') { #
+      <span class="cnvRate">${ kendo.toString(data.rate3, "n") }</span>
+      # } else { #
+      <span>${ kendo.toString(data.rate3, "n") }</span>
+      # } #
+   </script>
+}

@@ -1,0 +1,260 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+   <title>Rate Modeler</title>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <link href="http://cdn.kendostatic.com/2014.2.1008/styles/kendo.common.min.css" rel="stylesheet" type="text/css" />
+   <!--<link href="http://cdn.kendostatic.com/2014.2.1008/styles/kendo.default.min.css" rel="stylesheet" type="text/css" />-->
+   <link href="http://cdn.kendostatic.com/2014.2.1008/styles/kendo.blueopal.min.css" rel="stylesheet" type="text/css" />
+   <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+   <script src="http://cdn.kendostatic.com/2014.2.1008/js/jquery.min.js"></script>
+   <script src="http://cdn.kendostatic.com/2014.2.1008/js/kendo.all.min.js"></script>
+   <script src="http://cdn.kendostatic.com/2014.2.1008/js/kendo.aspnetmvc.min.js"></script>
+   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+   <style>
+      /* http://www.tutorialspoint.com/bootstrap/bootstrap_quick_guide.htm */
+      body {
+         font: 11px Arial,Helvetica,Sans-Serif;
+      }
+
+      .container-non-responsive {
+         display: table;
+         margin-left: auto;
+         margin-right: auto;
+         padding: 50px 0; /* tb rl */
+         width: 970px;
+      }
+      /* http://stackoverflow.com/questions/16852484/use-fieldset-legend-with-bootstrap */
+      .fieldset {
+         border: 1px solid #ccc;
+         padding: 10px;
+      }
+      .legend {
+         width: auto;
+         padding: 0 5px; /* tb lr */
+         border-bottom: none;
+         margin-bottom: 0;
+         font: bold 12px Arial,Helvetica,Sans-Serif;
+      }
+
+      .rate {
+         padding-left: 15px;
+         height: 28px;
+      }
+
+      label {
+         font-weight: 500; /* override bootstrap 700 */
+      }
+      
+      /*#grid .k-grid-header
+      {
+         padding: 0 !important;
+      }*/
+      #grid .k-grid-content {
+         overflow-y: visible;
+      }
+
+      /* http://blog.falafel.com/customizing-your-kendo-ui-grid-columns/ */
+      .k-grid-header .center-header {
+         text-align: center;
+      }
+
+      .k-grid-header .wrap-header {
+         height: 100px;
+         /*word-wrap: normal;*/
+         overflow-y: visible;
+         white-space: normal;
+      }
+
+      .align-center {
+         text-align: center;
+      }
+
+      .align-right {
+         text-align: right;
+      }
+   </style>
+</head>
+<body>
+   <div class="container-non-responsive">
+      <div class="row">
+         <div class="col-xs-4">
+            <fieldset class="fieldset">
+               <legend class="legend">Choose a Client/Matter:</legend>
+               <div>
+                  <div class="row">
+                     <div class="col-xs-5">
+                        <label>Client No/Name:</label>
+                     </div>
+                     <div class="col-xs-7">
+                        <input type="checkbox" id="chkSound"><label>"Sounds Like" search</label><br />
+                     </div>
+                  </div>
+                  <input type="radio" name="rbType" value="Client" checked><input type="text" id="txtClient" /><br />
+                  <input type="radio" name="rbType" value="Matter"><label for="Matter">Build a matter</label>
+                  <button id="btnSearch">Search</button>
+               </div>
+            </fieldset>
+         </div>
+         <div class="col-xs-4">
+            <fieldset class="fieldset">
+               <legend class="legend">Choose a Period(MMYY):</legend>
+               <div class="row">
+                  <input type="radio" name="rbPeriod" value="Year" checked><label for="Year">&nbsp;Current Year</label>
+               </div>
+               <div class="row">
+                  <input type="radio" name="rbPeriod" value="Period">&nbsp;<label for="Period">Period - Up to 3 years</label>
+               </div>
+               <div class="row">
+                  <label>From:</label><label>To:</label>
+               </div>
+               <div class="row">
+                  <input type="text" id="txtFrom" /><input type="text" id="txtTo" /><br />
+               </div>
+               <div class="row">
+                  <label>(MMYY)</label><label>(MMYY)</label>
+               </div>
+               <div class="row">
+                  <input type="checkbox" id="chkBilled" class="checkbox-inline" checked><label>Billed Time</label><input type="checkbox" class="checkbox-inline" id="chkUnbilled"><label>Unbilled Time</label><br />
+               </div>
+            </fieldset>
+         </div>
+         <div class="col-xs-4">
+            <fieldset class="fieldset">
+               <legend class="legend">Choose a Rate Model:</legend>
+               <div>
+                  <div class="row rate">Rate 1&nbsp;&nbsp;<div id="ddlModel1"></div></div>
+                  <div class="row rate">Rate 2&nbsp;&nbsp;<div id="ddlModel2"></div></div>
+                  <div class="row rate">Rate 3&nbsp;&nbsp;<div id="ddlModel3"></div></div>
+                  <div class="row"><button id="btnPull" class="k-button">Pull Roster</button></div>
+               </div>
+            </fieldset>
+         </div>
+      </div>
+
+      <div class="row">
+         <div class="col-xs-6">
+            <h6>Client:</h6>
+         </div>
+         <div class="col-xs-6">
+            <h6>Matter's Currency:</h6>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-xs-6">
+            <h6>Matter:</h6>
+         </div>
+         <div class="col-xs-6">
+            <h6>Matter's Rate Group:</h6>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-xs-12">
+            <div id="grid"></div>
+            <br />
+            <!--Icons: http://jsbin.com/uyulex -->
+            <button id="get" class="k-button">Get Data</button>
+            <button id="del" class="k-button" hidden>Delete a Row</button>
+            <button id="addRow" class="k-button" hidden>Add a Row</button>
+            <button id="addCol" class="k-button" hidden>Add a Column</button>
+         </div>
+      </div>
+
+   </div>
+
+
+   <script>
+      var myCols = [
+         { field: "status", title: "Billed/Unbilled", width: "75px", headerAttributes: { class: "wrap-header" }, attributes: { class: "align-center" } },
+         { field: "name", title: "Timekeeper Name", width: "100px", footerTemplate: "Sum" },
+         { field: "title", title: "Title" },
+         { field: "loc", title: "Loc", headerAttributes: { class: "center-header" }, attributes: { class: "align-center" } },
+         { field: "dep", title: "Dept", headerAttributes: { class: "center-header" }, attributes: { class: "align-center" } },
+         { field: "hrsBilled", title: "Hours Billed", format: "{0:n2}", attributes: { style: "text-align:right;" }, footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'n2') #</div>" },
+         { field: "amtBilled", title: "Amount Billed $", format: "{0:n2}", attributes: { class: "align-right" }, footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'n2') #</div>" },
+         { field: "rateBlended", title: "Blended Rate", format: "{0:n2}", attributes: { class: "align-right" } },
+         { field: "hrsProp", title: "Prop Hours", format: "{0:n2}", attributes: { class: "align-right" }, footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'n2') #</div>" },
+         { field: "rateProp", title: "Prop Rate", format: "{0:n2}", attributes: { class: "align-right" } },
+         { field: "calcProp", title: "Prop Calc", format: "{0:n2}", attributes: { class: "align-right" }, footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'n2') #</div>" }
+      ];
+
+      var myData = [
+         { status: "B", name: "BURNHAM, DANIEL C", title: "PARTNER", dep: "Corp.", hrsBilled: 112.30, amtBilled: 70226.22, totPrjRate1: 830, totPrjCalc1: 93209 },
+         { status: "U", name: "FRENCH, SCOTT Y", title: "ASSOCIATE, JR.", dep: "Corp.", hrsBilled: 2.00, amtBilled: 918.00, totPrjRate1: 620, totPrjCalc1: 1240 },
+         { status: "U", name: "LEBRON, ANTHONY P", title: "PARALEGAL", dep: "Corp.", hrsBilled: 1.60, amtBilled: 369.74, totPrjRate1: 295, totPrjCalc1: 472 }
+      ];
+      var myAggr = [
+         { field: "hrsBilled", aggregate: "sum" },        //  aggregate: "average"
+         { field: "amtBilled", aggregate: "sum" },
+         { field: "hrsProp", aggregate: "sum" },
+         { field: "calcProp", aggregate: "sum" }
+      ];
+      var ds = new kendo.data.DataSource({
+         data: myData,
+         aggregate: myAggr
+      });
+
+      $(function () {
+         var ddlModel1 = $('#ddlModel1').kendoDropDownList(),
+             ddlModel2 = $('#ddlModel2').kendoDropDownList(),
+             ddlModel3 = $('#ddlModel3').kendoDropDownList();
+
+         var grid = $("#grid").kendoGrid({
+            autoBind: false,
+            columns: myCols,
+            dataSource: ds,
+            selectable: "row",
+            resizable: true
+         }).data("kendoGrid");
+
+         $('#get').on('click', function (e) {
+            ds.read();        // "read()" will fire the "change" event of the dataSource and the widget will be bound
+         });
+         $('#del').on('click', function (e) {
+            var row = grid.select(),
+                data = grid.dataItem(row);
+
+            if (data !== null) {
+               alert(JSON.stringify(data, null, 4));
+               grid.removeRow(row);
+            }
+         });
+
+         $('#addRow').click(function () {
+            ds.add({ status: "U", name: "OMOKAWA, SUSAN S", title: "PARALEGAL", dep: "Corp.", hrsBilled: 1.20, amtBilled: 372.30, totPrjRate1: 410, totPrjCalc1: 492 })
+            grid.refresh();
+         });
+
+         // http://dojo.telerik.com/uvuco/2, http://dojo.telerik.com/oVEV/7
+         $('#addCol').click(function () {
+            myCols.push({ field: "totPrjRate1", title: "Total Prop Rate 1", format: "{0:n2}", width: "100px", attributes: { class: "align-right" } });
+            myCols.push({ field: "totPrjCalc1", title: "Total Prop Calc 1", format: "{0:n2}", width: "100px", attributes: { class: "align-right" }, footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'n2') #</div>" });
+
+            myAggr.push({ field: "totPrjCalc1", aggregate: "sum" });
+            ds.aggregate(myAggr);
+
+            //grid.columns = [];
+            //grid.thead.remove();
+            //grid.columns = myCols;
+            //grid.refresh();
+            grid.destroy();            // http://docs.telerik.com/kendo-ui/framework/widgets/destroy
+            $("#grid").empty();
+
+            grid = $("#grid").kendoGrid({
+               //autoBind: false,
+               columns: myCols,
+               dataSource: ds,
+               selectable: "row",
+               resizable: true
+            }).data("kendoGrid");
+            //ds.read();
+
+            // http://www.telerik.com/forums/kendo-grid-horizontal-scroll-bar
+
+         });
+      });
+   </script>
+</body>
+
+</html>

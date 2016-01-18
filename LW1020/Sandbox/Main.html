@@ -1,0 +1,268 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+   <title>Rate Modeler</title>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <link href="http://cdn.kendostatic.com/2014.2.1008/styles/kendo.common.min.css" rel="stylesheet" type="text/css" />
+   <!--<link href="http://cdn.kendostatic.com/2014.2.1008/styles/kendo.default.min.css" rel="stylesheet" type="text/css" />-->
+   <link href="http://cdn.kendostatic.com/2014.2.1008/styles/kendo.blueopal.min.css" rel="stylesheet" type="text/css" />
+   <script src="http://cdn.kendostatic.com/2014.2.1008/js/jquery.min.js"></script>
+   <script src="http://cdn.kendostatic.com/2014.2.1008/js/kendo.all.min.js"></script>
+   <script src="http://cdn.kendostatic.com/2014.2.1008/js/kendo.aspnetmvc.min.js"></script>
+
+   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+   <!--http://www.vanseodesign.com/css/grid-layout-module/-->
+   <!--http://www.vanseodesign.com/css/grid-examples-and-code/-->
+   <!--http://ie.microsoft.com/testdrive/graphics/hands-on-css3/hands-on_grid.htm-->
+   <style>
+      body {
+         font: 11px Arial,Helvetica,Sans-Serif;
+      }
+
+      #divMain {
+         display: -ms-grid;
+         -ms-grid-columns: 1fr[3];
+         -ms-grid-rows: 7fr 35px[2] 10fr 40px;
+         padding: 50px 25px; /* tb rl */
+         width: 970px;
+      }
+      #divType {
+	      -ms-grid-row: 1;
+	      -ms-grid-column: 1;
+      }
+      #divPeriod {
+	      -ms-grid-row: 1;
+	      -ms-grid-column: 2;
+      }
+      #divModel {
+	      -ms-grid-row: 1;
+	      -ms-grid-column: 3;
+      }
+      #divClient {
+	      -ms-grid-row: 2;
+	      -ms-grid-column: 1;
+      }
+      #divCurrency {
+	      -ms-grid-row: 2;
+	      -ms-grid-column: 3;
+      }
+      #divMatter {
+	      -ms-grid-row: 3;
+	      -ms-grid-column: 1;
+      }
+      #divGroup {
+	      -ms-grid-row: 3;
+	      -ms-grid-column: 3;
+      }
+      #divTk {
+	      -ms-grid-row: 4;
+	      -ms-grid-column: 1;
+         -ms-grid-column-span: 3;
+         height: 200px;
+      }
+      #divBtns{
+	      -ms-grid-row: 5;
+	      -ms-grid-column: 1;
+         -ms-grid-column-span: 3;
+      }
+
+      /*#grid .k-grid-content {
+         overflow-y: visible;
+      }*/
+
+      #grdTk{
+         max-width: 970px;
+      }
+   </style>
+
+</head>
+<body>
+   <div id="divMain">
+      <div id="divType">
+         <fieldset class="fieldset">
+            <legend class="legend">Choose a Client/Matter:</legend>
+            <div>
+               <div>
+                  <div>
+                     <label>Client No/Name:</label>
+                  </div>
+                  <div>
+                     <input type="checkbox" id="chkSound"><label>"Sounds Like" search</label><br />
+                  </div>
+               </div>
+               <input type="radio" name="rbType" value="Client" checked><input type="text" id="txtClient" /><br />
+               <input type="radio" name="rbType" value="Matter"><label for="Matter">Build a matter</label>
+               <button id="btnSearch">Search</button>
+            </div>
+         </fieldset>
+      </div>
+      <div id="divPeriod">
+         <fieldset class="fieldset">
+            <legend class="legend">Choose a Period(MMYY):</legend>
+            <div class="row">
+               <input type="radio" name="rbPeriod" value="Year" checked><label for="Year">&nbsp;Current Year</label>
+            </div>
+            <div class="row">
+               <input type="radio" name="rbPeriod" value="Period">&nbsp;<label for="Period">Period - Up to 3 years</label>
+            </div>
+            <div class="row">
+               <label>From:</label><label>To:</label>
+            </div>
+            <div class="row">
+               <input type="text" id="txtFrom" /><input type="text" id="txtTo" /><br />
+            </div>
+            <div class="row">
+               <label>(MMYY)</label><label>(MMYY)</label>
+            </div>
+            <div class="row">
+               <input type="checkbox" id="chkBilled" class="checkbox-inline" checked><label>Billed Time</label><input type="checkbox" class="checkbox-inline" id="chkUnbilled"><label>Unbilled Time</label><br />
+            </div>
+         </fieldset>
+      </div>
+      <div id="divModel">
+         <fieldset class="fieldset">
+            <legend class="legend">Choose a Rate Model:</legend>
+            <div>
+               <div class="rate">Rate 1&nbsp;&nbsp;<div id="ddlModel1"></div></div>
+               <div class="rate">Rate 2&nbsp;&nbsp;<div id="ddlModel2"></div></div>
+               <div class="rate">Rate 3&nbsp;&nbsp;<div id="ddlModel3"></div></div>
+               <div><button id="btnPull" class="k-button">Pull Roster</button></div>
+            </div>
+         </fieldset>
+      </div>
+      <div id="divClient">Client</div>
+      <div id="divCurrency">Currency</div>
+      <div id="divMatter">Matter</div>
+      <div id="divGroup">Group</div>
+      <div id="divTk"><div id="grdTk"></div></div>
+      <div id="divBtns">
+         <div id="divDel">Delete</div>
+         <div id="divAdd">Add</div>
+         <div id="divProj">Projection</div>
+         <div id="divExcel">Excel</div>
+      </div>
+   </div>
+
+   <br />
+   <!--Icons: http://jsbin.com/uyulex -->
+   <button id="get" class="k-button">Get Data</button>
+   <button id="del" class="k-button" hidden>Delete a Row</button>
+   <button id="addRow" class="k-button" hidden>Add a Row</button>
+   <button id="addCol" class="k-button" hidden>Add a Column</button>
+   <script>
+      var myCols = [
+         { field: "status", title: "Billed/Unbilled", width: "75px", headerAttributes: { class: "wrap-header" }, attributes: { class: "align-center" } },
+         { field: "id", title: "Id" },
+         { field: "name", title: "Timekeeper Name", width: "100px", footerTemplate: "Sum" },
+         { field: "title", title: "Title" },
+         { field: "lvl", title: "Level" },
+         { field: "loc", title: "Loc", headerAttributes: { class: "center-header" }, attributes: { class: "align-center" } },
+         { field: "dep", title: "Dept", headerAttributes: { class: "center-header" }, attributes: { class: "align-center" } },
+         { field: "hrsBill", title: "Hours Billed", format: "{0:n2}", attributes: { style: "text-align:right;" }, footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'n2') #</div>" },
+         { field: "amtBill", title: "Amount Billed $", format: "{0:n2}", attributes: { class: "align-right" }, footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'n2') #</div>" },
+         { field: "rateBlend", title: "Blended Rate", format: "{0:n2}", attributes: { class: "align-right" } },
+         { field: "hrsProp", title: "Prop Hours", format: "{0:n2}", attributes: { class: "align-right" }, footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'n2') #</div>" },
+         { field: "rateProp", title: "Prop Rate", format: "{0:n2}", attributes: { class: "align-right" } },
+         { field: "calcProp", title: "Prop Calc", format: "{0:n2}", attributes: { class: "align-right" }, footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'n2') #</div>" }
+      ],
+      myData = [
+         { status: "B", id: "02947", name: "BURNHAM, DANIEL C", title: "PARTNER", lvl: 1, loc: "LA", dep: "Fin.", hrsBill: 112.30, amtBill: 70226.22, rateBlend: 0, hrsProp: 0, rateProp: 0, calcProp: 0, totPrjRate1: 830, totPrjCalc1: 93209 },
+         { status: "U", id: "02616", name: "FRENCH, SCOTT Y", title: "ASSOCIATE, JR.", lvl: 1, loc: "SD", dep: "Corp.", hrsBill: 2.00, amtBill: 918.00, rateBlend: 0, hrsProp: 0, rateProp: 0, calcProp: 0, totPrjRate1: 620, totPrjCalc1: 1240 },
+         { status: "U", id: "01727", name: "LEBRON, ANTHONY P", title: "PARALEGAL", lvl: 1, loc: "DC", dep: "Tax", hrsBill: 1.60, amtBill: 369.74, rateBlend: 0, hrsProp: 0, rateProp: 0, calcProp: 0, totPrjRate1: 295, totPrjCalc1: 472 }
+      ],
+      myAggr = [
+         { field: "hrsBill", aggregate: "sum" },        //  aggregate: "average"
+         { field: "amtBill", aggregate: "sum" },
+         { field: "hrsProp", aggregate: "sum" },
+         { field: "calcProp", aggregate: "sum" }
+      ],
+      myModel = kendo.model.define({
+         id: "id",
+         fields: {
+            status: { editable: false },
+            id: { editable: false, nullable: false },
+            name: { editable: false },
+            title: { editable: false },
+            lvl: { editable: false, type: "number" },
+            loc: { editable: false },
+            dep: { editable: false },
+            hrsBill: { editable: false, type: "number", defaultValue: 0 },
+            amtBill: { editable: false, type: "number", defaultValue: 0 },
+            rateBlend: { editable: false, type: "number", defaultValue: 0 },
+            hrsProp: { type: "number", defaultValue: 0 },
+            rateProp: { type: "number", defaultValue: 0 },
+            calcProp: { type: "number", defaultValue: 0 }
+         }
+      }),
+      ds = new kendo.data.DataSource({
+         data: myData,
+         schema: { model: myModel },
+         aggregate: myAggr
+      });
+
+      $(function () {
+         var ddlModel1 = $('#ddlModel1').kendoDropDownList(),
+             ddlModel2 = $('#ddlModel2').kendoDropDownList(),
+             ddlModel3 = $('#ddlModel3').kendoDropDownList();
+
+         var grdTk = $("#grdTk").kendoGrid({
+            autoBind: false,
+            columns: myCols,
+            dataSource: ds,
+            height: 200,
+            selectable: "row",
+            resizable: true
+         }).data("kendoGrid");
+
+         $('#get').on('click', function (e) {
+            ds.read();        // "read()" will fire the "change" event of the dataSource and the widget will be bound
+         });
+         $('#del').on('click', function (e) {
+            var row = grdTk.select(),
+                data = grdTk.dataItem(row);
+
+            if (data !== null) {
+               alert(JSON.stringify(data, null, 4));
+               grdTk.removeRow(row);
+            }
+         });
+
+         $('#addRow').click(function () {
+            ds.add({ status: "U", name: "OMOKAWA, SUSAN S", title: "PARALEGAL", dep: "Corp.", hrsBill: 1.20, amtBill: 372.30, totPrjRate1: 410, totPrjCalc1: 492 })
+            grdTk.refresh();
+         });
+
+         // http://dojo.telerik.com/uvuco/2, http://dojo.telerik.com/oVEV/7
+         $('#addCol').click(function () {
+            myCols.push({ field: "totPrjRate1", title: "Total Prop Rate 1", format: "{0:n2}", width: "100px", attributes: { class: "align-right" } });
+            myCols.push({ field: "totPrjCalc1", title: "Total Prop Calc 1", format: "{0:n2}", width: "100px", attributes: { class: "align-right" }, footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'n2') #</div>" });
+
+            myAggr.push({ field: "totPrjCalc1", aggregate: "sum" });
+            ds.aggregate(myAggr);
+
+            //grdTk.columns = [];
+            //grdTk.thead.remove();
+            //grdTk.columns = myCols;
+            //grdTk.refresh();
+            grdTk.destroy();            // http://docs.telerik.com/kendo-ui/framework/widgets/destroy
+            $("#grdTk").empty();
+
+            grdTk = $("#grdTk").kendoGrid({
+               //autoBind: false,
+               columns: myCols,
+               dataSource: ds,
+               height: 200,
+               selectable: "row",
+               resizable: true
+            }).data("kendoGrid");
+            //ds.read();
+
+            // http://www.telerik.com/forums/kendo-grid-horizontal-scroll-bar
+
+         });
+      });
+   </script>
+
+</body>
+</html>

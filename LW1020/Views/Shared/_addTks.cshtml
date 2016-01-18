@@ -1,0 +1,278 @@
+﻿<link href="~/Content/css/addTks.css" rel="stylesheet" />
+
+<div id="divAddTks">
+   <div id="divTksContainer">
+      <div id="divLoc">
+         Choose an office:
+         <div id="lstLoc"></div>
+      </div>
+      <div id="divTitle">
+         Choose a title:
+         <div id="lstTitle"></div>
+      </div>
+      <div id="grdAvailTks"></div>
+   </div>
+
+   <div id="divBtnsContainer">
+      <div id="divQryCnc">
+         <button id="btnQuery" class="k-button">Query</button>
+      </div>
+      <div id="divAddDel">
+         <button id="btnAddTk" class="k-button">&gt;</button>
+         <button id="btnDelTk" class="k-button">&lt;</button>
+         <button id="btnAddRoster" class="k-button" disabled>Add to Roster</button>
+      </div>
+   </div>
+
+   <div id="divPrjHrs">
+      Update hours:
+      <div id="grdPrjHrs"></div>
+   </div>
+</div>
+
+<script>
+   (function ($, kendo) {
+      "use strict";
+      
+      var editNoSpinners = function (container, options) {  // Unlike a named function, a var "function" must be declared before use           
+         $('<input data-text-field="' + options.field + '" ' +
+               'data-value-field="' + options.field + '" ' +
+               'data-bind="value:' + options.field + '" ' +
+               'data-format="' + options.format + '"/>')
+               .appendTo(container)
+               .kendoNumericTextBox({
+                  spinners: false
+                  //decimals: 0,
+                  //format: '#',      // OR '0.' -- No decimal allowed
+               });
+      },
+      colsAvail = [
+            { field: "tkid", hidden: true },
+            { field: "name", title: "Timekeeper Name", width: 42 },
+            { field: "level", hidden: true },
+            { field: "title", title: "Title", width: 28 },
+            { field: "loc", hidden: true },
+            { field: "dept", hidden: true }
+      ],
+      colsPrj = [
+            { field: "tkid", hidden: true },
+            { field: "name", title: "Timekeeper Name", width: 45 },
+            { field: "level", hidden: true },
+            { field: "title", title: "Title", width: 25 },
+            { field: "loc", hidden: true },
+            { field: "dept", hidden: true },
+            { field: "qtyEmp", headerTemplate: "<div>No. of</div><div>Emp?</div>", width: 15, format: "{0:n0}", attributes: { class: "align-right" }, editor: editNoSpinners },
+            { field: "totHrs", headerTemplate: "<div>Prop</div><div>Hours</div>", width: 15, format: "{0:n2}", attributes: { class: "align-right" }, editor: editNoSpinners }
+      ],
+
+      // http://stackoverflow.com/questions/23394033/add-an-all-item-to-kendo-ui-listview-populated-by-a-remote-datasource?rq=1
+      lvLoc = $('#lstLoc').kendoListView({
+         dataSource: {
+            transport: {
+               read: {
+                  url: $.url('api/Modeler/GetLocations'),
+                  dataType: 'jsonData'
+               }
+            },
+            /*
+            schema: {
+               //model: {
+               //   id: "loc",
+               //   fields: {
+               //      loc: { type: "string" }
+               //   }
+               //},
+               parse: function (response) {  // Without using class LocMv
+                  var locs = [];
+                  for (var i = 0; i < response.length; i++) {
+                     var loc = {
+                        loc: response[i]
+                     };
+                     locs.push(loc);
+                  }
+                  return locs;
+               }
+            }
+            */
+            navigatable: true,
+            requestEnd: function (e) { kendo.ui.progress($("#winAdd"), false); }
+         },
+         template: "<div style='height: 15px;' data-LocCode=#:loc#>#:loc#</div>",
+         selectable: "multiple"
+         //change: function (e) {
+         //   var index = this.select().index(),
+         //       dataItem = this.dataSource.view()[index];
+         //   var data = this.dataSource.view(),
+         //       selected = $.map(this.select(), function (item) {
+         //          return data[$(item).index()].loc;
+         //       });
+         //   toastr.info("Selected: " + selected.length + " item(s), [" + selected.join(", ") + "]");
+         //}
+      }).data("kendoListView"),
+
+      lvTitle = $('#lstTitle').kendoListView({
+         dataSource: {
+            transport: {
+               read: {
+                  url: $.url('api/Modeler/GetTitles'),
+                  dataType: 'jsonData'
+               }
+            },
+            navigatable: true
+         },
+         template: "<div style='height: 15px;' data-TitleCode=#:lvl#>#:title#</div>",
+         selectable: "multiple"
+      }).data("kendoListView"),
+
+      grdAvail = $('#grdAvailTks').kendoGrid({
+         columns: colsAvail,
+         selectable: "multiple, row",
+         resizable: true
+      }).data("kendoGrid"),
+
+      grdPrj = $('#grdPrjHrs').kendoGrid({
+         columns: colsPrj,
+         selectable: "multiple, row",
+         resizable: true,
+         editable: true,
+         edit: function (e) {
+            var fieldname = this.columns[e.container.index()].field,
+                editfields = 'qtyEmp, totHrs';   // Allowed editable fields
+            if (editfields.indexOf(fieldname) === -1) this.closeCell();
+         },
+         dataBound: function (e) {
+            if(this.dataSource.total() === 0)
+               $('#btnAddRoster').prop('disabled', true);
+            else
+               $('#btnAddRoster').prop('disabled', false);
+         }
+      }).data("kendoGrid");
+
+      $('#btnQuery').on('click', function (e) {
+         //var lvLoc = $('#lstLoc').getKendoListView(),
+         //    lvTitle = $('#lstTitle').getKendoListView(),
+         //    grdAvail = $('#grdAvailTks').getKendoGrid(),
+         //    grdPrj = $('#grdPrjHrs').getKendoGrid();
+         var selLoc = lvLoc.element.find('.k-state-selected'),
+             arrLoc = new Array(),
+             selLocCodes = new String(),
+             selTitle = lvTitle.element.find('.k-state-selected'),
+             arrTitle = new Array(),
+             selTitleCodes = new String();
+
+         if (selLoc.length === 0) {
+            toastr.warning('Please select an office to query.');
+            return false;        // e.preventDefault() + e.stopPropagation()
+         }
+         if (selTitle.length === 0) {
+            toastr.warning('Please select a title to query.');
+            return false;
+         }
+
+         // Convert lists selections into CSVs
+         arrLoc = $.map(selLoc, function (val) {
+            return val.dataset.loccode;
+         })
+         selLocCodes = arrLoc.join(',');
+         arrTitle = $.map(selTitle, function (val, i) {
+            return val.dataset.titlecode;
+         });
+         selTitleCodes = _.uniq(arrTitle).join(',');
+
+         //grdAvail.destroy();
+         //grdAvail.wrapper.empty();
+         grdAvail = $('#grdAvailTks').kendoGrid({
+            dataSource: {
+               transport: {
+                  read: {
+                     url: $.url('api/Modeler/GetRateTks'),
+                     dataType: 'jsonData',
+                     data: { 'locs': selLocCodes, 'titles': selTitleCodes }
+                  }
+               },
+               serverPaging: true,
+               change: function (e) {
+                  if (this.total() == 0)
+                     toastr.warning('No timekeepers found');
+               },
+               error: function (e) {
+                  toastr.error('Unable to make remote call to GetRateTks');
+               }
+            },
+            columns: colsAvail,
+            selectable: "multiple, row",
+            resizable: true
+         }).data("kendoGrid");
+
+      });
+
+      $("#btnAddTk").on("click", function () {
+         moveTo(grdAvail, grdPrj);
+      });
+
+      $("#btnDelTk").on("click", function () {
+         moveTo(grdPrj, grdAvail);
+      });
+
+      $("#btnAddRoster").on("click", function () {
+         window.parent.$('#winAdd').data("kendoWindow").close();
+      });
+
+      function moveTo(from, to) {
+         kendo.ui.progress($('#winAdd'), true);
+         var selected = from.select();
+         if (selected.length > 0) {
+            var items = [];
+            $.each(selected, function (idx, elem) {
+               items.push(from.dataItem(elem));
+            });
+            //var items = $.map(selected, function (elem, idx) {
+            //   return from.dataItem(elem);
+            //});
+            // http://www.telerik.com/forums/adding-multiple-rows-performance
+            // https://onabai.wordpress.com/2013/01/28/kendoui-move-rows-between-grids
+            
+            var fromDS = from.dataSource,
+                toDS = to.dataSource,
+                fromData = fromDS.data().toJSON(),
+                toData = toDS.data().toJSON();
+               /* SLOW PROCESS
+               $.each(items, function (idx, elem) {
+                  toDS.add({
+                     tkid: elem.tkid,
+                     name: elem.name,
+                     level: elem.level,
+                     title: elem.title,
+                     loc: elem.loc,
+                     dept: elem.dept,
+                     qtyEmp: 1,
+                     totHrs: 0
+                  });
+                  fromDS.remove(elem);
+               });
+               */
+
+            $.each(items, function (idx, elem) {
+               elem.qtyEmp = 1;
+               elem.totHrs = 0;
+               findAndRemove(fromData, 'tkid', elem.tkid);
+            });
+
+            fromDS.data(fromData);
+            toDS.data(_.union(toData, items));
+         }
+         kendo.ui.progress($("#winAdd"), false);
+      }
+
+      function findAndRemove(array, property, value) {
+         $.each(array, function (index, result) {
+            if (result[property] == value) {
+               //Remove from array
+               array.splice(index, 1);
+               return false;
+            }
+         });
+      }
+
+   }(jQuery, window.kendo))
+</script>

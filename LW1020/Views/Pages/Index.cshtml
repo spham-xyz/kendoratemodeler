@@ -1,0 +1,165 @@
+﻿@{
+   ViewBag.Title = "Index";
+}
+
+<div id="tvClients"></div>
+<div id="ddlRate1"></div>
+<div id="ddlRate2"></div>
+<div id="ddlRate3"></div>
+
+@section scripts {
+   <script>
+      $(function () {
+         function clElement(text, desc) {
+            this.text = text;
+            this.desc = desc;
+         };
+
+         function Element(text, value) {
+            this.text = text;
+            this.value = value;
+         };
+
+         $.ajax({
+            url: $.url('api/Modeler/GetClients'),
+            data: { ClientId: '', ClientName: 'joh', ClientDpt: '', MatterId: '', MatterName: '', Soundex: 0 },
+            dataType: 'json',
+            success: function (result) {
+
+               var data = result.Data;
+               if (JSON.stringify(data) != "[]") {
+                  /*
+                  var TVdata = $.map(data, function (el, idx) {
+                     //return new clElement(el.clnum.trim(), el.clname1.trim());
+                     return $.extend(new clElement(el.clnum.trim(), el.clname1.trim()),
+                        { items: new Array( new clElement(el.mmatter.trim(), el.mdesc1.trim()) ) })
+                  });
+                  alert(JSON.stringify(TVdata, null, 4));
+                  */
+
+                  var getUniqueClient = function (prev, curr) {
+                     var num = curr.clnum;
+                     prev[num] = prev[num] || [];
+                     prev[num].push(curr);
+                     return prev;
+                  }
+                  var groupedByClients = data.reduce(getUniqueClient, {});
+                  //alert(JSON.stringify(groupedByClients, null, 2));
+
+                  var output = [];
+                  var clData = Object.keys(groupedByClients).reduce(function (a, prop) {
+                     var dtl = [];
+                     //alert(groupedByClients[prop][0].clname1);
+                     //groupedByClients['052409'].length --> 2
+                     //groupedByClients['052409'][0].mdesc1 --> "General"
+                     //groupedByClients['052409'][1].mdesc1 --> "United States Radio Station Project"
+                     //a[prop] = groupedByClients[prop]
+
+                     groupedByClients[prop].forEach(function (val) {
+                        dtl.push({
+                           text: val.mmatter.trim(),
+                           desc: val.mdesc1.trim()
+                        });
+                     });
+
+                     output.push({
+                        text: groupedByClients[prop][0].clnum.trim(),
+                        desc: groupedByClients[prop][0].clname1.trim(),
+                        items: dtl
+                     });
+                     return output;
+                  }, {});
+                  //alert(JSON.stringify(clData, null, 2));
+
+                  //var treeview = $("#tvClients").kendoTreeView({ template: "#= item.text #  #= item.desc #" }).data("kendoTreeView");
+                  //treeview.setDataSource(new kendo.data.HierarchicalDataSource({ data: clData }));
+                  $("#tvClients").kendoTreeView({
+                     template: "#= item.text # #= item.desc #",
+                     dataSource: clData,
+                     select: function (e) {
+                        if (this.text(e.node).length != 6) console.log(this.text(e.node));
+                     }
+                  });
+
+               }
+            },
+            error: function (xhr, status, err) {
+               alert('GetClients: ' + err);
+            }
+         });
+
+         //Auto Adjust Width of Kendo DropDownList - JSFiddle
+         //http://jsfiddle.net/TBkEe/
+         $.ajax({
+            //url: '@Url.Action("GetRates", "Home", null, "http")',
+            //type: 'POST',
+            url: $.url('api/Modeler/GetRates'),
+            success: function (result) {
+               var data = result.Data;
+               if (JSON.stringify(data) != "[]") {
+                  var rtGrp = -123,
+                      rtData = new Array(new Element('', ''));
+                  data.forEach(function (val) {
+                     if (val.rtRateGroup != rtGrp) {
+                        rtData.push(new Element(val.rtRateGroupDesc.trim(), val.rtRateGroup));     // Group header
+                        rtGrp = val.rtRateGroup;
+                     }
+                     rtData.push(new Element(val.rtDesc.trim(), val.rtCurr.trim() + '|' + val.rtCode + '|' + val.rtCurrSymbol.trim()));
+                  });
+
+                  $('#ddlRate1').kendoDropDownList({
+                     dataTextField: "text",
+                     dataValueField: "value",
+                     dataSource: rtData,
+                     template: kendo.template($("#tmplRate").html()),
+                     //dataBound: function (e) {
+                     //   e.sender.dataSource.transport.data.unshift({ text: '062', value: 'Total' });
+                     //},
+                     select: NoHeaders
+                  }).data("kendoDropDownList").list.width("auto");;
+
+                  $('#ddlRate2').kendoDropDownList({
+                     dataTextField: "text",
+                     dataValueField: "value",
+                     dataSource: rtData,
+                     template: kendo.template($("#tmplRate").html()),
+                     select: NoHeaders
+                  }).data("kendoDropDownList").list.width("auto");;
+
+                  $('#ddlRate3').kendoDropDownList({
+                     dataTextField: "text",
+                     dataValueField: "value",
+                     dataSource: rtData,
+                     template: kendo.template($("#tmplRate").html()),
+                     select: NoHeaders
+                  }).data("kendoDropDownList").list.width("auto");;
+               }
+            },
+            error: function (xhr, status, err) {
+               alert('GetRates: ' + err);
+            }
+         });
+
+         var NoHeaders = function (e) {
+            // Disallowed group headers selection
+            var dataItem = this.dataItem(e.item.index());
+            if (typeof dataItem.value === 'number') {
+               e.preventDefault();
+            }
+         };
+
+      });
+
+   </script>
+
+   @*http://docs.telerik.com/kendo-ui/framework/templates/overview*@
+   <script id="tmplRate" type="text/x-kendo-template">
+      # if (typeof data.value !== 'number') { #
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <span>${data.text}</span>
+      # } else { #
+      <span>${data.text}</span>
+      # } #
+   </script>
+
+}

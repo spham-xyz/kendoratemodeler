@@ -1,0 +1,258 @@
+﻿<link href="~/Content/css/multiYrProj.css" rel="stylesheet" />
+
+<div id="divProj">
+   <div id="divInput">
+      <div>
+         <label id="lblStart">Start Date (MM/YYYY):&nbsp;&nbsp;</label>
+         @*<span id="spnStart"><input id="startDate" validationmessage="Invalid date" pattern="^(0[1-9]|1[012])\/\d{4}$" required /></span>*@
+         <span id="spnStart"><input id="startDate" name="Start Date" required autofocus /></span>
+      </div>
+      <div>
+         <label id="lblDuration">Duration in Months:&nbsp;&nbsp;</label>
+         <span id="spnDuration"><input id="txtDuration" name="Duration" required />&nbsp; mos.</span>
+      </div>
+      <div>
+         <label id="lblIncrease">Annual Rate Increase:&nbsp;&nbsp;</label>
+         <span id="spnIncrease"><input id="txtIncrease" name="Annual Increase" required />&nbsp; %</span>
+      </div>
+      <div id="divYears">
+         <label for="Years">Allocate across years</label>
+         <input type="radio" name="rbAlloc" value="Years" checked>
+      </div>
+      <div id="divMonths">
+         <label for="Months">Allocate across months</label>
+         <input type="radio" name="rbAlloc" value="Months">
+      </div>
+      <div id="divButtons">
+         <button id="btnAlloc" class="k-button">Allocate Hours</button>&nbsp;&nbsp;&nbsp;
+         <button id="btnContinue" class="k-button" disabled>Continue</button>
+      </div>
+   </div>
+   <div id="divGrid">
+      <div id="lblAlloc">Allocate hours:</div>
+      <div id="grdAlloc"></div>
+   </div>
+</div>
+
+<script>
+   require(['utils'], function (utils) {
+      //(function ($) {
+      var model = kendo.data.Model.define({
+         fields: {
+            dte: { type: "string" },
+            pct: { type: "number" }
+         }
+      }),
+      aggrs = [{ field: "pct", aggregate: "sum" }],
+      cols = [
+        { field: 'dte', title: 'Duration', footerTemplate: 'Grand Total' },
+        {
+           field: 'pct', title: 'Percentage', format: '{0:p}', attributes: { class: "align-right" },
+           footerTemplate: "<div style='float: right'>#= kendo.toString(sum, 'p') #</div>"
+        }
+      ],
+      today = new Date(),
+      day, mnths, incr,
+
+      dteStart = $("#startDate").kendoDatePicker({
+         depth: "year",
+         start: "year",
+         format: "MM/yyyy",
+         parseFormats: ["MM/yyyy"],
+         min: new Date(today.getFullYear(), today.getMonth(), 1),     // Cannot choose date earlier than current month
+         change: function () {
+            var value = this.value();
+            if(value != null) this.value(new Date(value.getFullYear(), value.getMonth(), 1));   // Set selection to 1st of month
+         }
+      }).data("kendoDatePicker"),
+
+      //$("#startDate").closest("span.k-datepicker").width(75);
+
+      //$("#startDate").kendoValidator({
+      //   messages: {
+      //      date: 'Invalid date format (MM/yyyy)'
+      //   },
+      //   rules: {
+      //      date: function (input) {
+      //         var d = kendo.parseDate(input.val(), "MM/yyyy");
+      //         return d instanceof Date;
+      //      }
+      //   }
+      //});
+
+      // http://jsfiddle.net/krustev/uZUjK/
+      numDura = $("#txtDuration")
+         .width(50)
+         .addClass('align-right')
+         .kendoNumericTextBox({
+            spinners: false,
+            decimals: 0,
+            format: '#',      // OR '0.' -- No decimal allowed
+            min: 0,
+            max: 60           // Maximum period of 5 years or 60 months
+         }).data("kendoNumericTextBox"),
+
+      numIncr = $("#txtIncrease")
+         .width(50)
+         .addClass('align-right')
+         .kendoNumericTextBox({
+            spinners: false,
+            min: 0,
+            value: 5
+         }).data("kendoNumericTextBox");
+
+      bindMaxMinErrors(numDura);
+
+      $("#startDate").kendoValidator({ // NOT on "#startDate"; spnStart
+         rules: {
+            valid: function (e) {
+               var val = $(e).val().trim(),
+                  valid = moment(val, ['MM/YYYY'], true).isValid();       // kendo.parseDate is BUGGY.
+               if (val != '' && !valid) {
+                  return false;
+               }
+               return true;
+            },
+            minDate: function (e) {
+               var val = $(e).val().trim(),
+                  valid = moment(val, ['MM/YYYY'], true).isValid();
+               if (valid) {
+                  if (moment(val, ['MM/YYYY'], true) < moment().startOf('month'))
+                     return false;
+               }
+               return true;
+            }
+         },
+         messages: {
+            valid: "Invalid date",
+            minDate: "Not before current date"
+         }
+      });
+
+      //$("#startDate").focus();
+
+      $("#grdAlloc").kendoGrid({
+         dataSource: {
+            schema: { model: model },
+            aggregate: aggrs
+         },
+         columns: cols
+      });
+
+      //$(".k-datepicker input").prop("readonly", true);   // Prevent keyboard entry
+      // Retrieve previous entries
+      if (utils.pctDist !== undefined) {        
+         dteStart.value(utils.day);
+         numDura.value(utils.mnths);
+         numIncr.value(utils.incr);
+         
+         if(utils.pctDist[0].dte.indexOf('/') === -1)
+            $("input:radio[value='Years']").prop('checked', true);
+         else
+            $("input:radio[value='Months']").prop('checked', true);
+      }
+
+      $('#btnAlloc').on('click', function () {
+         //var validator = $('#divProj').kendoValidator({
+         //   rules: {
+         //      date: function (input) {
+         //         if (input.is('[id=startDate]')) {
+         //            var d = kendo.parseDate(input.val(), "MM/yyyy");
+         //            return d instanceof Date;
+         //         }
+         //         return true;
+         //      }
+         //   }
+         //}).data("kendoValidator");
+         //if (!validator.validate()) {
+         //   if (!validator.validateInput($("#startDate"))) toastr.error('Start date is required');
+         //   if (!validator.validateInput($("#txtDuration"))) toastr.error('Duration in months is required');
+         //   if (!validator.validateInput($("#txtIncrease"))) toastr.error('Annual rate increase is required');
+         //   return false;
+         //}
+         var re = /^(0[1-9]|1[012])\/\d{4}$/,
+             dte = $("#startDate").val(),
+             data;
+
+         day = $("#startDate").data("kendoDatePicker").value(),
+         mnths = $("#txtDuration").data("kendoNumericTextBox").value(),
+         incr = $("#txtIncrease").data("kendoNumericTextBox").value();
+         
+         if (day == null) {
+            if (re.test(dte))
+               toastr.error('Start date cannot be earlier than current date');
+            else
+               toastr.error('Invalid start date');
+
+            return false;
+         }
+         if (mnths == null) {
+            toastr.error('Duration in months is required');
+            return false;
+         }
+         if (incr == null) {
+            toastr.error('Annual rate increase is required');
+            return false;
+         }
+         
+         //$("#grdAlloc").data("kendoGrid").setDataSource(ds);
+         //grdAlloc.setDataSource(ds);
+
+         if ($('input[name=rbAlloc]:checked').val() === 'Years') {
+            data = utils.yrAlloc(day, mnths);
+            utils.yrs = data.length;
+         } else {
+            data = utils.mnthAlloc(day, mnths);
+            utils.yrs = (new Date(data[data.length - 1].dte)).getFullYear() - (new Date(data[0].dte)).getFullYear() + 1;
+         }
+         utils.pctDist = data;
+         utils.day = day;
+         utils.mnths = mnths
+         utils.incr = incr;
+
+         $("#grdAlloc").kendoGrid({
+            dataSource: {
+               data: data,
+               schema: { model: model },
+               aggregate: aggrs
+            },
+            columns: cols
+         });
+         $('#btnContinue').prop('disabled', false);
+
+      })
+
+      $('#btnContinue').on('click', function () {
+         $('#divStart').text('Proj Start Date:  ' + moment(utils.day).format('MM/DD/YYYY'));
+         $('#divDuration').text('Proj Duration:  ' + utils.mnths + ' mos.');
+         //$(this).closest(".k-window-content").data("kendoWindow").close();
+         window.parent.$('#winPrj').data("kendoWindow").close();
+      })
+
+      function bindMaxMinErrors(_numeric) {
+         _numeric._originalAdjust = _numeric._adjust;
+         _numeric._adjust = function () {
+            if (arguments[0] < this.min()) {
+               this.trigger("notMin", arguments[0]);
+            };
+            if (arguments[0] > this.max()) {
+               this.trigger("notMax", arguments[0]);
+            };
+            return _numeric._originalAdjust.apply(this, arguments);
+         };
+
+         _numeric.bind("notMin", function (value) {
+            toastr.warning(value + " is invalid. Reset to minimum allowed: " + this.min());
+         });
+         _numeric.bind("notMax", function (value) {
+            toastr.warning(value + " is invalid. Reset to maximum allowed: " + this.max());
+         });
+      }
+
+      //$('#btnCancel').on('click', function () {
+      //   $(this).closest(".k-window-content").data("kendoWindow").close();
+      //})
+
+      //})(jQuery);
+   });
+</script>
